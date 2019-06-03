@@ -1,6 +1,8 @@
 import json
 import urllib.request
+import binascii
 
+# for debug
 import keys
 
 def postrequest(url, port, data):
@@ -14,13 +16,57 @@ def postrequest(url, port, data):
         with urllib.request.urlopen(req) as res:
             body = json.load(res)
     except urllib.error.HTTPError as err:
-        code = err.code
-        return False, code
+        print(err.reason)
+        return False, None
     except urllib.error.URLError as err:
-        code = err.code
-        return False, code
+        print(err.reason)
+        return False, None
     return True, body
 
+'''
+sendMsgTransaction - Sending Message Transation via Geth JSON-RPC API
+
+input:
+   fromaddr(str)  : sender's ethereum address
+   toaddr(str)    : reciever's ethereum address
+   data(str)      : sending string data
+   pw(str)        : password for sender's private key on geth 
+'''
+def sendMsgTransaction(fromaddr, toaddr, data, pw):
+    prms = {
+        "jsonrpc":"2.0",
+        "method":"",
+        "params":[],
+        "id":1
+        }
+    # UnlockAccount
+    prms["method"] = "personal_unlockAccount"
+    prms["params"] = [fromaddr, pw]
+    result, response = postrequest(url, port, prms)
+    if not result:
+        return 0
+    print(response)
+    
+    # send Transaction
+    hexdata = binascii.hexlify(data.encode("utf-8")).decode("utf-8") 
+    prms["method"] = "eth_sendTransaction"
+    prms["params"] = [{
+                    "from": fromaddr,
+                    "to": toaddr,
+                    "data": "0x" + hexdata
+                    }]
+    result, response = postrequest(url, port, prms)
+    if not result:
+        return 0
+    print(response)
+
+    # LockAccount
+    prms["method"] = "personal_lockAccount"
+    prms["params"] = [fromaddr]
+    result, response = postrequest(url, port, prms)
+    if not result:
+        return 0
+    print(response)
 
 url = 'http://localhost'
 port = "8545"
@@ -28,38 +74,5 @@ port = "8545"
 addr = keys.addr
 pw = keys.pw
 
-def sendTransaction(addr, pw):
-    data = {
-        "jsonrpc":"2.0",
-        "method":"",
-        "params":[],
-        "id":1
-        }
-    # UnlockAccount
-    data["method"] = "personal_unlockAccount"
-    data["params"] = [addr, pw]
-    result, response = postrequest(url, port, data)
-    print(response)
-    if not result:
-        return 0
-
-    # send Transaction
-    data["method"] = "eth_sendTransaction"
-    data["params"] = [{
-                    "from": addr,
-                    "data": "0x1111"
-                    }]
-    result, response = postrequest(url, port, data)
-    print(response)
-    if not result:
-        return 0
-
-    # LockAccount
-    data["method"] = "personal_lockAccount"
-    data["params"] = [addr]
-    result, response = postrequest(url, port, data)
-    print(response)
-    if not result:
-        return 0
-
-sendTransaction(addr, pw)
+senddata = "Hello from blockchain!"
+sendMsgTransaction(addr, "0x0000000000000000000000000000000000000000", senddata, pw)
