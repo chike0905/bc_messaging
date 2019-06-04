@@ -1,6 +1,7 @@
 import json
 import urllib.request
 import binascii
+import cfg 
 
 # for debug
 import keys
@@ -42,7 +43,7 @@ def sendMsgTransaction(fromaddr, toaddr, data, pw):
     # UnlockAccount
     prms["method"] = "personal_unlockAccount"
     prms["params"] = [fromaddr, pw]
-    result, response = postrequest(url, port, prms)
+    result, response = postrequest(cfg.url, cfg.port, prms)
     if not result:
         return 0
     print(response)
@@ -55,7 +56,7 @@ def sendMsgTransaction(fromaddr, toaddr, data, pw):
                     "to": toaddr,
                     "data": "0x" + hexdata
                     }]
-    result, response = postrequest(url, port, prms)
+    result, response = postrequest(cfg.url, cfg.port, prms)
     if not result:
         return 0
     print(response)
@@ -63,13 +64,10 @@ def sendMsgTransaction(fromaddr, toaddr, data, pw):
     # LockAccount
     prms["method"] = "personal_lockAccount"
     prms["params"] = [fromaddr]
-    result, response = postrequest(url, port, prms)
+    result, response = postrequest(cfg.url, cfg.port, prms)
     if not result:
         return 0
     print(response)
-
-url = 'http://localhost'
-port = "8545"
 
 addr = keys.addr
 pw = keys.pw
