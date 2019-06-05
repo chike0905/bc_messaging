@@ -1,0 +1,18 @@
+@startuml
+skinparam shadowing false
+skinparam monochrome true
+title Messaging Over Blockchain
+
+actor Sender
+participant Blockchain_Client_A
+participant Blockchain_Nodes
+participant Blockchain_Client_B
+actor Reciever
+
+Sender -> Blockchain_Client_A: Request sending Message
+Blockchain_Client_A -> Blockchain_Nodes: Broadcast Message embeded TX
+Blockchain_Nodes -> Blockchain_Nodes: Create Block Message embeded TX
+Reciever -> Blockchain_Client_B: Requiest pull Messages to Reciever
+Blockchain_Client_B -> Blockchain_Nodes: Polling TXs included in Blockchain to Reciever
+Blockchain_Client_B --> Reciever: Show Messages
+@enduml
