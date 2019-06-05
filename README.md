@@ -8,7 +8,9 @@ Massaging over Blcokchain
 - Geth 1.8.27-stable
 
 ## Operation summary
-WIP
+![sequence](https://github.com/chike0905/bc_messaging/blob/img/sequence.png)
+- Message is emmbeded to TX and included to Blockchain.
+- Since it is difficult to rewrite the blockchain, you can take the TX in the blockchain as proof that the messaging existed.
 
 ## How to Use
 - You should setup sender's ethereum account in geth node that this script connects.
