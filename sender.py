@@ -2,9 +2,9 @@ import json
 import urllib.request
 import binascii
 import cfg 
+import sys
+from getpass import getpass
 
-# for debug
-import keys
 
 def postrequest(url, port, data):
     headers = {
@@ -44,9 +44,10 @@ def sendMsgTransaction(fromaddr, toaddr, data, pw):
     prms["method"] = "personal_unlockAccount"
     prms["params"] = [fromaddr, pw]
     result, response = postrequest(cfg.url, cfg.port, prms)
-    if not result:
-        return 0
-    print(response)
+    if result != True or "error" in response.keys():
+      print("%s:%s" % (response["error"]["code"], response["error"]["message"]))
+      return 0
+    print("Account %s is unlocked." % fromaddr)
     
     # send Transaction
     hexdata = binascii.hexlify(data.encode("utf-8")).decode("utf-8") 
@@ -57,20 +58,25 @@ def sendMsgTransaction(fromaddr, toaddr, data, pw):
                     "data": "0x" + hexdata
                     }]
     result, response = postrequest(cfg.url, cfg.port, prms)
-    if not result:
-        return 0
-    print(response)
+    if result != True or "error" in response.keys():
+      print("%s:%s" % (response["error"]["code"], response["error"]["message"]))
+      return 0
+    print("Message TX is created (%s)." % response["result"])
 
     # LockAccount
     prms["method"] = "personal_lockAccount"
     prms["params"] = [fromaddr]
     result, response = postrequest(cfg.url, cfg.port, prms)
-    if not result:
-        return 0
-    print(response)
+    if result != True or "error" in response.keys():
+      print("%s:%s" % (response["error"]["code"], response["error"]["message"]))
+      return 0
+    print("Account %s is locked." % fromaddr)
 
-addr = keys.addr
-pw = keys.pw
-
-senddata = "Hello from blockchain!"
-sendMsgTransaction(addr, "0x0000000000000000000000000000000000000000", senddata, pw)
+if __name__ == '__main__':
+   args = sys.argv
+   fromaddr = args[1]
+   toaddr = args[2]
+   senddata = args[3]
+   
+   pw = getpass('your password for %s: ' % fromaddr)
+   sendMsgTransaction(fromaddr, toaddr, senddata, pw)
