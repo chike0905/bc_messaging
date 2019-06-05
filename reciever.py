@@ -1,6 +1,8 @@
 import json
 import urllib.request
 import binascii
+import sys
+
 import cfg
 
 
@@ -25,6 +27,7 @@ def postrequest(url, port, data):
 
 
 def pollingchain(addr): 
+    print("Searching Meassage to %s" % addr)
     prms = {
         "jsonrpc":"2.0",
         "method":"",
@@ -47,10 +50,17 @@ def pollingchain(addr):
          if len(response["result"]["transactions"]):
             for tx in response["result"]["transactions"]:
                if tx["to"] == addr:
+                  print("----------------------")
+                  print("Message is found in Block %s" % response["result"]["hash"])
                   bytemsg = binascii.unhexlify(tx["input"][2:])
                   msg = bytemsg.decode("utf-8")
-                  print(msg)
+                  print("TxID: %s" % tx["hash"])
+                  print("From: %s" % tx["from"])
+                  print("Message: %s" % msg)
          counter += 1 
 
+if __name__ == '__main__':
+   args = sys.argv
+   addr = args[1]
+   pollingchain(addr)
    
-pollingchain(cfg.addr)

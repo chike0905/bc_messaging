@@ -21,4 +21,8 @@ python sender.py "sender's ethereum address" "reciever's ethereum address" messa
 - You are asked password for the sender's account on geth node.
 
 ### Recieve Message
-WIP
+- In recieving message, you don't need to setup reciever's address.
+   - just input address as parameter
+```
+python reciever.py "reciever's ethereum address"
+```
